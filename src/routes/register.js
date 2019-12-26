@@ -8,25 +8,14 @@ router.post('/', async (req, res) => {
     const credentials = req.body;
     const user = new User({
       email: credentials.email,
-      passwordHash: credentials.password,
     });
+    user.setPassword(credentials.password);
 
-    const checkUser = User.find({ email: credentials.email });
-    if (!checkUser) {
-      await user.save((err, entry) => {
-        if (err) return;
-        res.send({
-          message: `New user with email ${entry.email} was registered.`,
-        });
-      });
-    } else {
-      res.status(403).json({
-        message: 'User is already registered',
-      });
-    }
+    await user.save();
+    res.send(user.toJSON());
   } catch (error) {
     res.status(400).send({
-      message: 'Something went wrong. You were not registered.',
+      error: 'This email account is already in use.',
     });
   }
 });
