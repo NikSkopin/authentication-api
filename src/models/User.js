@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-// import bcrypt from 'bcrypt';
 import uniqueValidator from 'mongoose-unique-validator';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -21,15 +20,25 @@ const schema = new mongoose.Schema(
   { timestamps: true },
 );
 
-schema.plugin(uniqueValidator, { message: 'is already taken' });
+schema.plugin(uniqueValidator, {
+  message: 'is already taken',
+});
 
-schema.methods.setPassword = function setPassword(password) {
+schema.methods.setPassword = function setPassword(
+  password,
+) {
   this.salt = crypto.randomBytes(16).toString('hex');
-  this.passwordHash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+  this.passwordHash = crypto
+    .pbkdf2Sync(password, this.salt, 10000, 512, 'sha512')
+    .toString('hex');
 };
 
-schema.methods.validPassword = function validPassword(password) {
-  const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+schema.methods.validPassword = function validPassword(
+  password,
+) {
+  const hash = crypto
+    .pbkdf2Sync(password, this.salt, 10000, 512, 'sha512')
+    .toString('hex');
   return this.passwordHash === hash;
 };
 
@@ -38,11 +47,15 @@ schema.methods.generateJWT = function generateJWT() {
   const exp = new Date(today);
   exp.setDate(today.getDate() + 60);
 
-  return jwt.sign({
-    id: this._id,
-    email: this.email,
-    exp: parseInt(exp.getTime() / 1000, 10),
-  }, secret);
+  return jwt.sign(
+    {
+      /* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
+      id: this._id,
+      email: this.email,
+      exp: parseInt(exp.getTime() / 1000, 10),
+    },
+    secret,
+  );
 };
 
 schema.methods.toAuthJSON = function toAuthJSON() {
@@ -51,6 +64,5 @@ schema.methods.toAuthJSON = function toAuthJSON() {
     token: this.generateJWT(),
   };
 };
-
 
 export default mongoose.model('User', schema);

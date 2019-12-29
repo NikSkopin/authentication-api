@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
     const isPasswordValid = await user.validPassword(credentials.password);
     if (!isPasswordValid) {
       return res.status(403).send({
-        error: 'The password information was incorrect.'
+        error: 'The password information was incorrect.',
       });
     }
 
@@ -25,7 +25,6 @@ router.post('/', async (req, res) => {
       email: userJson.email,
       token: userJson.token,
     });
-
   } catch (error) {
     res.status(403).json({
       error: 'The login information was incorrect',

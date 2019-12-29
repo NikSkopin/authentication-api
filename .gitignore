@@ -22,3 +22,4 @@ yarn-error.log*
 *.sw?
 .prettierrc.js
 .editorconfig
+package-lock.json
